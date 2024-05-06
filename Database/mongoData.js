@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const {Schema} = mongoose
 //Fim
 //Schemas e Models
-const userData = new Schema({
+const userdatas = new Schema({
     matricula: Number,
     nome: String,
     classe: String,
@@ -32,7 +32,7 @@ const schoolClass = new Schema({
     classe: String,
     serie: Number,
 });
-const dataUser = mongoose.model("dataUser", userData)
+const dataUser = mongoose.model("dataUser", userdatas)
 
 const userCreate = mongoose.model("userCreate", userLogin);
 const userDataPresente = mongoose.model("userData", userDataPresence);
@@ -67,6 +67,7 @@ class discentePresente {
             console.log(err)
             return
         })
+
     }
 
     async checkAndProcessExit(matricula, nome, classe, serie){
@@ -123,28 +124,28 @@ class discentePresente {
     }
 
     async insertNewData(matricula, nome, classe, serie, email, dataNascimento){
-        await dataUser.create({
+        const inserir = dataUser.create({
             matricula: matricula,
             nome:nome,
             classe:classe,
             serie:serie,
             email: email,
             dataNascimento: dataNascimento
-        }).then(()=>{
-            return "Novo discente criado com sucesso"
-        }).catch((err)=>{
-            return "Erro ao criar o discente" + err
         })
     }
 
+// Metodo de Encontrar Dados
     async findData(matricula){
-        const resultFind = await dataUser.findOne({
+        try{
+            const resultFind = await dataUser.findOne({
             matricula:matricula
-        }).then(()=>{
-            return resultFind
-        }).catch((err)=>{
-            return "Nao foi possivel encontrar seus dados"+err
         })
+        return resultFind
+    }
+    catch(err){
+        return err
+    }
+        
     }
 }
 

@@ -4,14 +4,19 @@ const app = express();
 const discentePresente = require('./Database/mongoData');
 const bodyParser = require('body-parser')
 
+//Mongo Class
+
+    //Usuario, Senha, Localização do Servidor, Porta do Servidor
 
 const mongo = new discentePresente("root", "victor", "127.0.0.1", 30300);
+    //FIm
 
 //Fim Imports
 
 //Configurações
 
-app.use(bodyParser.urlencoded(bodyParser.urlencoded({extended: true})))
+app.use(express.urlencoded({extended: false}))
+app.use(express.json());
 
 mongo.connectionDatabase();
 port = 9010;
@@ -23,7 +28,7 @@ port = 9010;
 app.get('/', (req,res) =>{
     res.send("Victor");
 })
-
+//Rota responsável pelo LOGIN do usuario
 app.post('/loginhandle', async (req,res)=>{
     matricula = req.body.nome
     password = req.body.password
@@ -37,33 +42,50 @@ app.post('/loginhandle', async (req,res)=>{
         res.send(resultado)
     }
 })
-
+//Rota responsavel por adicionar novos dados a collection userData
 app.post('/dataCreate', async (req,res)=>{
-    const insertData = await mongo.insertNewData(req.body.matricula, req.body.nome, req.body.classe,req.body.serie, req.body.email, req.body.dataNascimento)
+    const data = req.body
+
+    const date = new Date(data.dataNascimento)
+
+    await mongo.insertNewData(data.matricula, data.nome, data.classe,data.serie, data.email, date)
+
+    await console.log(data.matricula)
     
-    res.send(insertData)
+    res.send("OK")
     
 })
-app.post('/dataFind', (req,res)=>{
-    const findResult = mongo.findData({matricula:req.body.matricula})
-    res.send(findResult)
+
+
+
+//Rota responsavel por consultar dados da collection userData
+app.post('/dataFind', async (req,res)=>{
+
+
+    const date = req.body
+
+    try{
+        const findResult = await mongo.findData(date.matricula)
+        console.log(findResult)
+        res.send(findResult)
+    }
+    catch(err){
+        return "erro"
+
+    }
     
+    
+    
+
 })
+
+
+
+//Rota responsavel por confirmar a presença dos alunos
 
 app.post('/presenceConfirm', (req,res)=>{
-    mongo.checkAndProcessExit();
-
-    res.send()
-
-
-
-
-
+    const confirm = mongo.checkAndProcessExit();
+    res.send(confirm)
 })
-
-
-
-
-
 
 app.listen(port, ()=>{console.log("ok")})
