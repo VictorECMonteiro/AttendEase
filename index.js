@@ -2,7 +2,8 @@
 const express = require('express');
 const app = express();
 const discentePresente = require('./Database/mongoData');
-const bodyParser = require('body-parser')
+const auth = require("./Middleware/tokenVerify.js");
+const { admin, editor, viewer } = require("./Middleware/userFunctions.js");
 
 //Mongo Class
 
@@ -30,36 +31,59 @@ app.get('/', (req,res) =>{
 })
 //Rota responsável pelo LOGIN do usuario
 app.post('/loginhandle', async (req,res)=>{
-    matricula = req.body.nome
-    password = req.body.password
+    const data = req.body
 
-    const resultado = await mongo.userLoginCheck(nome, password)
-
-    if(resultado == true){
-        res.send({matricula:matricula, resultado:resultado})
+    const resultado = await mongo.userLoginCheck(data.user, data.password)
+    console.log(resultado)
+    
+    if(resultado.resultado == true){
+        res.send({fresultado:resultado.finalResult,
+            matricula:resultado.matricula
+        })
+        
     }
     else{
+        console.log(resultado.finalResult)  
         res.send(resultado)
     }
 })
+//Rota responsavel por criar novos logins de usuario
+app.post('/loginCreate',async (req,res)=>{
+    const data = req.body
+    try{
+        mongo.userLoginCreate(data.matricula, data.user, data.password, data.funcao)
+        res.send("Usuário criado com sucesso")
+    }
+    catch(err){
+        res.send("Erro ao criar o usuário, Tente Novamente")
+    }
+})
+
+
+
 //Rota responsavel por adicionar novos dados a collection userData
-app.post('/dataCreate', async (req,res)=>{
+app.post('/dataCreate',[auth, admin] , async (req,res)=>{
     const data = req.body
 
     const date = new Date(data.dataNascimento)
 
-    await mongo.insertNewData(data.matricula, data.nome, data.classe,data.serie, data.email, date)
 
-    await console.log(data.matricula)
+
+    await mongo.insertNewData(data.matricula, data.nome, data.classe,data.serie, data.email, date).then(()=>{
+        res.send("OK")
+    }).catch((err)=>{
+        console.log(err)
+        res.send("Nao foi possivel criar")
+
+    })
     
-    res.send("OK")
     
 })
 
 
 
 //Rota responsavel por consultar dados da collection userData
-app.post('/dataFind', async (req,res)=>{
+app.post('/dataFind', [auth, admin] ,async (req,res)=>{
 
 
     const date = req.body
@@ -73,10 +97,6 @@ app.post('/dataFind', async (req,res)=>{
         return "erro"
 
     }
-    
-    
-    
-
 })
 
 
