@@ -68,6 +68,7 @@ Usamos mongo como banco de dados, NodeJS e módulos como: Express, Mongoose; Bcr
 |`nome`|`string`|
 |`classe`|`string`|
 |`serie`|`int`|
+|`funcao`|`string`|
 
 ## Usado para criar login de usuário, necessario ser admin
 
