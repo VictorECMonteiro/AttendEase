@@ -65,7 +65,7 @@ Usamos mongo como banco de dados, NodeJS e módulos como: Express, Mongoose; Bcr
 |Parâmetro|Tipo|
 |:--------|:---|
 |`matricula`|`int`|
-|`nome`|`string`|
+|`user`|`string`|
 |`classe`|`string`|
 |`serie`|`int`|
 |`funcao`|`string`|
@@ -78,7 +78,7 @@ Usamos mongo como banco de dados, NodeJS e módulos como: Express, Mongoose; Bcr
 |Parâmetro|Tipo|
 |:--------|:---|
 |`matricula`|`int`|
-|`nome`|`string`|
+|`user`|`string`|
 |`password`|`string`|
 |`funcao`|`string`|
 
