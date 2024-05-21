@@ -27,31 +27,32 @@ port = 9010;
 //Fim configurações
 //Rotas API
 app.get('/', (req,res) =>{
-    res.send("Victor");
+    res.send("Victor1");
 })
+
 //Rota responsável pelo LOGIN do usuario
 app.post('/loginhandle', async (req,res)=>{
     const data = req.body
 
-    const resultado = await mongo.userLoginCheck(data.user, data.password)
-    console.log(resultado)
-    
-    if(resultado.resultado == true){
-        res.send({fresultado:resultado.finalResult,
-            matricula:resultado.matricula
+    const resultado = await mongo.userLoginCheck(data.matricula, data.password)
+    if(resultado != null){
+        res.send({
+            fresultado:resultado.finalResult,
+            matricula:resultado.matricula,funcao:resultado.funcao,
+            token:resultado.token
         })
         
     }
-    else{
-        console.log(resultado.finalResult)  
-        res.send(resultado)
+    else{  
+        res.send("Erro, verifique seu usuário ou senha");
     }
 })
+
 //Rota responsavel por criar novos logins de usuario
-app.post('/loginCreate',async (req,res)=>{
+app.post('/loginCreate',[auth, admin], async (req,res)=>{
     const data = req.body
     try{
-        mongo.userLoginCreate(data.matricula, data.user, data.password, data.funcao)
+        mongo.userLoginCreate(data.matricula, data.nome, data.password, data.funcao)
         res.send("Usuário criado com sucesso")
     }
     catch(err){
@@ -67,8 +68,6 @@ app.post('/dataCreate',[auth, admin] , async (req,res)=>{
 
     const date = new Date(data.dataNascimento)
 
-
-
     await mongo.insertNewData(data.matricula, data.nome, data.classe,data.serie, data.email, date).then(()=>{
         res.send("OK")
     }).catch((err)=>{
@@ -83,7 +82,7 @@ app.post('/dataCreate',[auth, admin] , async (req,res)=>{
 
 
 //Rota responsavel por consultar dados da collection userData
-app.post('/dataFind', [auth, admin] ,async (req,res)=>{
+app.post('/dataFind',[auth, viewer],async (req,res)=>{
 
 
     const date = req.body
@@ -103,8 +102,9 @@ app.post('/dataFind', [auth, admin] ,async (req,res)=>{
 
 //Rota responsavel por confirmar a presença dos alunos
 
-app.post('/presenceConfirm', (req,res)=>{
-    const confirm = mongo.checkAndProcessExit();
+app.post('/presenceConfirm', [auth, viewer],(req,res)=>{
+    const data = req.body
+    const confirm = mongo.checkAndProcessExit(data.matricula, data.nome, data.classe, data.serie);
     res.send(confirm)
 })
 
