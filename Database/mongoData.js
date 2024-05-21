@@ -62,48 +62,66 @@ class discentePresente {
         this.databasePort = databasePort;
     }
 
-    connectionDatabase() {
+    async connectionDatabase() {
 
         console.log(this.userName)
+        while(true){
+            try{
+                    const bancoConecta = await mongoose.connect("mongodb://" + this.userName + ":" + this.passwordDatabase + "@" + this.databaseIP + ":" + this.databasePort, { dbName: "discentePresente" })
+                    if(bancoConecta != null){
+                        console.log("Banco conectado")
+                        break;
+                    }
+            }
+            catch(err){
+                console.log("Falha ao conectar ao banco de dados")
+            }
 
-        mongoose.connect("mongodb://" + this.userName + ":" + this.passwordDatabase + "@" + this.databaseIP + ":" + this.databasePort, { dbName: "discentePresente" }).then(() => {
-            console.log("OK");
-        }).catch((err) => {
-            console.log(err)
-            return
-        })
+
+        }
+
+
+
+
 
     }
 
     async checkAndProcessExit(matricula, nome, classe, serie) {
 
         const checkEntrada = await userDataPresente.findOne({
-            nome: nome,
+            matricula: matricula,
             entrada: date.getDate
         });
 
-        if (checkEntrada.saida == null) {
-            await userDataPresente.create({
-                matricula: matricula,
-                nome: nome,
-                classe: classe,
-                serie: serie,
-                entrada: date,
-                saida: date
-            });
-            return "Saída Confirmada"
+        try{
+            if (checkEntrada.saida == null) {
+                await userDataPresente.create({
+                    matricula: matricula,
+                    nome: nome,
+                    classe: classe,
+                    serie: serie,
+                    entrada: date,
+                    saida: date
+                });
+                return "Saída Confirmada"
+            }
+            else {
+                await userDataPresente.create({
+                    matricula: matricula,
+                    nome: nome,
+                    classe: classe,
+                    serie: serie,
+                    entrada: date,
+                    saida: null
+                });
+                return "Presença Confirmada"
+            }
         }
-        else {
-            await userDataPresente.create({
-                matricula: matricula,
-                nome: nome,
-                classe: classe,
-                serie: serie,
-                entrada: date,
-                saida: null
-            });
-            return "Presença Confirmada"
+        catch(err){
+            return "Não foi possivel confirmar a presença"
         }
+
+        
     }
 
     async userLoginCreate(matricula, user, password, funcao) {
@@ -128,22 +146,22 @@ class discentePresente {
     
     }
 
-    async userLoginCheck(user, password) {
+    async userLoginCheck(matricula, password) {
         try{
 
             const resultFind = await userCreate.findOne({
-                nome:user
+                matricula:matricula
             })
             
-
             const resultado = await bcrypt.compare(password, resultFind.password)
 
             const token = jwt.sign({
                 nome: resultFind.user,
                 roles: resultFind.funcao,
-            }, "VictorCorreia", { expiresIn: "15m" });
+            }, "VictorCorreia", { expiresIn: "24h" });
 
             const result = {
+                matricula:resultFind.matricula,
                 funcao:resultFind.funcao,
                 finalResult:resultado,
                 token:token
@@ -163,19 +181,21 @@ class discentePresente {
 
 
     async insertNewData(matricula, nome, classe, serie, email, dataNascimento) {
-        const inserir = dataUser.create({
-            matricula: matricula,
-            nome: nome,
-            classe: classe,
-            serie: serie,
-            email: email,
-            dataNascimento: dataNascimento
-        }).then(()=>{
-            return "OK"
 
-        }).catch((err)=>{
-            return err
-        })
+        try{
+            const inserir = dataUser.create({
+                matricula: matricula,
+                nome: nome,
+                classe: classe,
+                serie: serie,
+                email: email,
+                dataNascimento: dataNascimento
+            })
+        }
+        catch(err){
+        }
+
+
     }
 
     // Metodo de Encontrar Dados
@@ -183,18 +203,6 @@ class discentePresente {
         try {
             const resultFind = await dataUser.findOne({
                 matricula: matricula
-            })
-            return resultFind
-        }
-        catch (err) {
-            return err
-        }
-
-    }
-    async findDataFunc(matricula) {
-        try {
-            const resultFind = await userCreate.findOne({
-                nome:matricula
             })
             return resultFind
         }
