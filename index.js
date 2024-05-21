@@ -71,7 +71,6 @@ app.post('/dataCreate',[auth, admin] , async (req,res)=>{
     await mongo.insertNewData(data.matricula, data.nome, data.classe,data.serie, data.email, date).then(()=>{
         res.send("OK")
     }).catch((err)=>{
-        console.log(err)
         res.send("Nao foi possivel criar")
 
     })

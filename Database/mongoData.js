@@ -63,18 +63,14 @@ class discentePresente {
     }
 
     async connectionDatabase() {
-
-        console.log(this.userName)
         while(true){
             try{
                     const bancoConecta = await mongoose.connect("mongodb://" + this.userName + ":" + this.passwordDatabase + "@" + this.databaseIP + ":" + this.databasePort, { dbName: "discentePresente" })
                     if(bancoConecta != null){
-                        console.log("Banco conectado")
                         break;
                     }
             }
             catch(err){
-                console.log("Falha ao conectar ao banco de dados")
             }
 
 
@@ -139,7 +135,7 @@ class discentePresente {
         }
     )}
     catch(err){
-        console.log("Não foi possivel cadastrar")
+        return "Nao foi possivel cadastrar"
     }
 
     
@@ -171,11 +167,7 @@ class discentePresente {
         }
         catch(err){
             return err
-            console.log("ERRO"+err)
         }
-
-
-
 
     }
 
