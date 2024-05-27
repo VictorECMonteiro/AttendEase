@@ -4,7 +4,7 @@
 
 function admin(req, res, next) {
     console.log(req.body.funcao)
-    if (req.body.funcao!="admin") return res.status(403).send({
+    if (req.body.funcaous!="admin") return res.status(403).send({
         ok: false,
         error: "Access denied."
     });
@@ -13,7 +13,7 @@ function admin(req, res, next) {
 }
 
 function editor(req, res, next) {
-    if (req.body.funcao!="editor") return res.status(403).send({
+    if (req.body.funcaous!="editor") return res.status(403).send({
         ok: false,
         error: "Access denied."
     });
@@ -22,7 +22,7 @@ function editor(req, res, next) {
 }
 
 function viewer(req, res, next) {
-    if (req.body.funcao!="viewer") return res.status(403).send({
+    if (req.body.funcaous!="viewer") return res.status(403).send({
         ok: false,
         error: "Access denied."
     });
