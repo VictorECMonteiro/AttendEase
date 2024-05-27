@@ -150,12 +150,12 @@ class discentePresente {
             })
             
             const resultado = await bcrypt.compare(password, resultFind.password)
+            if(resultado == true){
 
             const token = jwt.sign({
                 nome: resultFind.user,
                 roles: resultFind.funcao,
-            }, "VictorCorreia", { expiresIn: "24h" });
-
+            }, "VictorCorreia", { expiresIn: "24h" })
             const result = {
                 matricula:resultFind.matricula,
                 funcao:resultFind.funcao,
@@ -163,6 +163,16 @@ class discentePresente {
                 token:token
             }
             return result
+        }
+        else{
+            const result = {
+                matricula:resultFind.matricula,
+                funcao:resultFind.funcao,
+                finalResult:resultado,
+            }
+            return result
+        }
+
 
         }
         catch(err){
