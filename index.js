@@ -4,12 +4,13 @@ const app = express();
 const discentePresente = require('./Database/mongoData');
 const auth = require("./Middleware/tokenVerify.js");
 const { admin, editor, viewer } = require("./Middleware/userFunctions.js");
+require('dotenv').config();
 
 //Mongo Class
 
     //Usuario, Senha, Localização do Servidor, Porta do Servidor
 
-const mongo = new discentePresente("root", "victor", "127.0.0.1", 30300);
+const mongo = new discentePresente("", "", process.env.IP, process.env.PORTA);
     //FIm
 
 //Fim Imports
@@ -20,20 +21,19 @@ app.use(express.urlencoded({extended: false}))
 app.use(express.json());
 
 mongo.connectionDatabase();
-port = 9010;
+port = process.env.PORTAPI;
 
 
 
 //Fim configurações
 //Rotas API
 app.get('/', (req,res) =>{
-    res.send("Victor1");
+    res.send("Servidor Iniciado");
 })
 
 //Rota responsável pelo LOGIN do usuario
 app.post('/loginhandle', async (req,res)=>{
     const data = req.body
-
     const resultado = await mongo.userLoginCheck(data.matricula, data.password)
     if(resultado != null){
         res.send({

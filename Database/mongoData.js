@@ -63,10 +63,26 @@ class discentePresente {
     }
 
     async connectionDatabase() {
-        while(true){
+        if(!this.userName){
+            while(true){
+                try{
+                        const bancoConecta = await mongoose.connect("mongodb://"+this.databaseIP + ":" + this.databasePort, { dbName: "discentePresente" })
+                        if(bancoConecta != null){
+                            console.log("Banco conectado")
+                            break;
+                        }
+                }
+                catch(err){
+                }
+            }
+        }
+        else{
+                    
+            while(true){
             try{
                     const bancoConecta = await mongoose.connect("mongodb://" + this.userName + ":" + this.passwordDatabase + "@" + this.databaseIP + ":" + this.databasePort, { dbName: "discentePresente" })
                     if(bancoConecta != null){
+                        console.log("Banco conectado")
                         break;
                     }
             }
@@ -75,6 +91,12 @@ class discentePresente {
 
 
         }
+
+
+}
+
+
+
 
 
 
@@ -124,7 +146,7 @@ class discentePresente {
         try{
             bcrypt.genSalt(10,(err, salt)=>{
                 bcrypt.hash(password, salt, (err, hash)=>{
-                    console.log(hash)
+                
                     userCreate.create({
                         matricula: matricula,
                         nome: user,
@@ -155,7 +177,7 @@ class discentePresente {
             const token = jwt.sign({
                 nome: resultFind.user,
                 roles: resultFind.funcao,
-            }, "VictorCorreia", { expiresIn: "24h" })
+            }, process.env.API, { expiresIn: "24h" })
             const result = {
                 matricula:resultFind.matricula,
                 funcao:resultFind.funcao,
