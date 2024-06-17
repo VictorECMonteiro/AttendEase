@@ -55,7 +55,7 @@ Usamos mongo como banco de dados, NodeJS e módulos como: Express, Mongoose; Bcr
 |`serie`|`int`|
 |`email`|`string`|
 |`dataNascimento`|`date`|
-|`funcao`|`string`|
+|`funcaous`|`string`|
 
 ## Confirmar a presença ou saída;
 
