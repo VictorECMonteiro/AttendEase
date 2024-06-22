@@ -26,12 +26,14 @@
     "content-type": "^1.0.5",
     "cookie": "^0.6.0",
     "cookie-signature": "^1.0.6",
+    "dayjs": "^1.11.11",
     "debug": "^4.3.4",
     "define-data-property": "^1.1.4",
     "delegates": "^1.0.0",
     "depd": "^2.0.0",
     "destroy": "^1.2.0",
     "detect-libc": "^2.0.3",
+    "dotenv": "^16.4.5",
     "ecdsa-sig-formatter": "^1.0.11",
     "ee-first": "^1.1.1",
     "emoji-regex": "^8.0.0",
@@ -144,10 +146,10 @@
     "yallist": "^4.0.0"
   },
   "scripts": {
-    "install":"install",
+    "install": "install",
     "start": "nodemon index.js",
-    "rebuild":"rebuild bcrypt --build-from-source",
-    "update":"install -g npm"
+    "rebuild": "rebuild bcrypt --build-from-source",
+    "update": "install -g npm"
   },
   "author": "",
   "license": "ISC",

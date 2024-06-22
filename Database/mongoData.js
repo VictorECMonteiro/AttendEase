@@ -2,6 +2,8 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const dayjs = require('dayjs');
+const { boolean } = require('webidl-conversions');
 
 
 
@@ -23,8 +25,10 @@ const userDataPresence = new Schema({
     nome: String,
     classe: String,
     serie: Number,
-    entrada: Date,
-    saida: Date
+    data: String,
+    hrEntrada: String,
+    hrSaida: String,
+    entrou: Number,
 
 });
 const userLogin = new Schema({
@@ -44,9 +48,10 @@ const userDataPresente = mongoose.model("userData", userDataPresence);
 //Fim Schemas e Models
 
 //Data Method
-const date = new Date();
-date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-console.log(date);
+
+
+
+
 //Fim Data Method
 
 
@@ -105,41 +110,77 @@ class discentePresente {
     }
 
     async checkAndProcessExit(matricula, nome, classe, serie) {
+        var date = dayjs()
 
-        const checkEntrada = await userDataPresente.findOne({
-            matricula: matricula,
-            entrada: date.getDate
-        });
+        var horas = date.$H +":" +date.$m
 
-        try{
-            if (checkEntrada.saida == null) {
-                await userDataPresente.create({
-                    matricula: matricula,
-                    nome: nome,
-                    classe: classe,
-                    serie: serie,
-                    entrada: date,
-                    saida: date
-                });
-                return "Saída Confirmada"
-            }
-            else {
-                await userDataPresente.create({
-                    matricula: matricula,
-                    nome: nome,
-                    classe: classe,
-                    serie: serie,
-                    entrada: date,
-                    saida: null
-                });
-                return "Presença Confirmada"
-            }
-        }
-        catch(err){
-            return "Não foi possivel confirmar a presença"
-        }
+        var mes = date.$M + 1
 
+        var dia = date.$D
+
+        var ano = date.$y
+
+
+        var dataCompleta = dia + "-" + mes + "-" + ano
+
+
+
+
+
+        try {
+            // Executa a consulta para verificar se já existe algum registro com essa matrícula e data
+            var check = await userDataPresente.findOne({
+                matricula: matricula,
+                data: dataCompleta
+            });
         
+            // Verifica se encontrou algum registro
+            if (check) {
+                
+                // Se hrSaida for null, atualiza o registro existente
+                if (check.hrSaida === null || entrou === 0) {
+                    console.log("retornou algo")
+                    await userDataPresente.updateOne(
+                        { _id: check._id }, // filtro pelo ID do documento encontrado
+                        { $set: { hrSaida: horas, entrou: 1 } } // atualiza hrSaida e entrou
+                    );
+                } else {
+                    console.log("retornou algo e nao é nulo")
+                    // Se hrSaida não for null, cria um novo registro
+                    await userDataPresente.create({
+                        matricula: matricula,
+                        nome: nome,
+                        classe: classe,
+                        serie: parseInt(serie),
+                        data: dataCompleta,
+                        hrEntrada: horas,
+                        hrSaida: null,
+                        entrou: 0
+                    });
+                }
+            } else {
+                // Se não encontrou nenhum registro, cria um novo registro
+                console.log("Nao retornou nada")
+                console.log(horas)
+                await userDataPresente.create({
+                    matricula: matricula,
+                    nome: nome,
+                    classe: classe,
+                    serie: parseInt(serie),
+                    data: dataCompleta,
+                    hrEntrada: horas,
+                    hrSaida: null,
+                    entrou: 0
+                });
+            }
+        
+            
+        } catch (error) {
+            console.error("Erro ao executar operação:", error);
+        }
+        
+
+ 
     }
 
     async userLoginCreate(matricula, user, password, funcao) {
@@ -227,6 +268,19 @@ class discentePresente {
         try {
             const resultFind = await dataUser.findOne({
                 matricula: matricula
+            })
+            return resultFind
+        }
+        catch (err) {
+            return err
+        }
+
+    }
+    async findPresence(classe, serie) {
+        try {
+            const resultFind = await userDataPresente.find({
+                classe:classe,
+                serie:serie
             })
             return resultFind
         }

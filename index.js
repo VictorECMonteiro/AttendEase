@@ -88,7 +88,6 @@ app.post('/dataFind',[auth, viewer],async (req,res)=>{
 
     try{
         const findResult = await mongo.findData(date.matricula)
-        console.log(findResult)
         res.send(findResult)
     }
     catch(err){
@@ -106,5 +105,37 @@ app.post('/presenceConfirm', [auth, viewer],(req,res)=>{
     const confirm = mongo.checkAndProcessExit(data.matricula, data.nome, data.classe, data.serie);
     res.send(confirm)
 })
+
+app.post('/presenceFind', [auth, viewer], async(req, res)=>{
+    const data = req.body
+    try{
+        const something = await mongo.findPresence(data.classe, data.serie)
+        console.log(something)
+        
+        res.send(something)
+    }
+    catch{
+        
+
+
+    }
+    
+ 
+
+
+
+
+})
+
+
+
+
+
+    
+
+
+
+
+
 
 app.listen(port, ()=>{console.log("ok")})

@@ -22,4 +22,4 @@ function viewer(req, res, next) {
     
 }
 
-module.exports = { admin, editor, viewer };
+module.exports = { admin, viewer };
